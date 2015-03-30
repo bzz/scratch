@@ -8,5 +8,6 @@ github.startAt = 1
 
 jira.url = https://issues.apache.org/jira
 jira.project = FLINK
+jira.startAt = 0
 jira.username = github-import
 jira.password = yourJiraImportUserPassword

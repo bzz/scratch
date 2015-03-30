@@ -8,6 +8,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.rcarz.jiraclient.BasicCredentials;
 import net.rcarz.jiraclient.Field;
@@ -133,16 +135,35 @@ public class App  {
     	text = text.replaceAll("\\[([^\\]]+)\\]\\(([^\\]]+)\\)", "[$1|$2]");
     	
     	// issue id to jira / github link
+    	String jiraIssueNum = calculateNewJiraIssueNumber(text, props.getProperty("jira.startAt"));
     	text = text.replaceAll("\\#([0-9]+)", 
     		"([\\#$1|https://github.com/"+props.getProperty("github.user")+"/"+props.getProperty("github.repository")+"/issues/$1]"
     				+ " | "
-    				+ "[FLINK-$1|"+props.getProperty("jira.url")+"/browse/"+props.getProperty("jira.project")+"-$1])");
+    				+ "[" +props.getProperty("jira.project")+ "-" +jiraIssueNum+ "|"+props.getProperty("jira.url")+"/browse/"+props.getProperty("jira.project")+"-" + jiraIssueNum +"])");
     	// commit hash to github link
     	text = text.replaceAll("([^/]{1})([a-z0-9]{40})", "$1[$2|https://github.com/"+props.getProperty("github.user")+"/"+props.getProperty("github.repository")+"/commit/$2]");
     	
     	return text;
     }
-    
+
+
+    static Pattern jiraIssueNumberPattern = Pattern.compile("\\#([0-9]+)");
+
+    private static String calculateNewJiraIssueNumber(String text, String startAt) {
+      Integer numberOfIssues = startAt == null? 0 : Integer.valueOf(startAt)-1;
+      String origIssueNum = "0";
+      boolean found = false;
+      Matcher jiraIssueNumberMatcher = jiraIssueNumberPattern.matcher(text);
+      while (!found && jiraIssueNumberMatcher.find()) {
+        origIssueNum = jiraIssueNumberMatcher.group(1);
+        found = true;
+      }
+      Integer i = numberOfIssues + Integer.valueOf(origIssueNum);
+      return i.toString();
+    }
+
+
+
     private static String userToUrl(User user) {
 		return "["+user.getLogin()+"|"+user.getHtmlUrl()+"]";
 	}
