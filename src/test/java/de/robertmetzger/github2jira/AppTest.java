@@ -17,6 +17,7 @@ public class AppTest {
 		p.setProperty("github.repository", "stratosphere");
 		p.setProperty("jira.url", "https://issues.apache.org/jira");
 		p.setProperty("jira.project", "FLINK");
+		p.setProperty("jira.startAt", "1");
 		
 		Assert.assertEquals("Shouldn't we close this now? Seems to be resolved by ([#238|https://github.com/stratosphere/stratosphere/issues/238] | [FLINK-238|https://issues.apache.org/jira/browse/FLINK-238]).", 
 				App.autorefIssuesInText("Shouldn't we close this now? Seems to be resolved by #238.",p) );
